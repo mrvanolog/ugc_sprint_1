@@ -1,0 +1,33 @@
+@startuml
+
+skinparam componentStyle uml2
+actor User
+actor Admin
+database PostgresMovieData
+database PostgresAuthData
+database ElasticSearch
+database OLAP
+database OLTP
+component AdminPanel
+component Frontend
+component API
+component Auth
+component ETL
+component DataAnalysisETL
+
+User -right-> Frontend: Запрос на просмотр контента
+Frontend -right-> API: Запрос данных
+API -right-> Auth: Запрос на аутентификацию/авторизацию пользователя
+API -down-> OLTP : Запись событий пользователей
+OLTP -down-> DataAnalysisETL
+DataAnalysisETL -down->OLAP
+API -down-> ElasticSearch
+Auth -right-> PostgresAuthData
+PostgresMovieData -up-> ETL
+ETL -down-> PostgresMovieData
+ETL -up-> ElasticSearch
+Admin -left-> AdminPanel: Редактирование данных
+AdminPanel -left-> ElasticSearch
+AdminPanel -up-> PostgresAuthData
+
+@enduml
