@@ -27,7 +27,6 @@ PostgresMovieData -up-> ETL
 ETL -down-> PostgresMovieData
 ETL -up-> ElasticSearch
 Admin -left-> AdminPanel: Редактирование данных
-AdminPanel -left-> ElasticSearch
-AdminPanel -up-> PostgresAuthData
+AdminPanel -up-> PostgresMovieData
 
 @enduml
