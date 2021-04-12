@@ -19,8 +19,8 @@ component DataAnalysisETL
 User -right-> LoadBalancer: Запрос на просмотр контента
 LoadBalancer -right-> API: Запрос данных
 API -right-> Auth: Запрос на аутентификацию/авторизацию пользователя
-LoadBalancer -down-> TokenValidator
-TokenValidator -down-> Kafka : Запись событий пользователей
+LoadBalancer -down-> TokenValidator: Валидация access_token
+TokenValidator -down-> Kafka: Запись событий пользователей
 Kafka -down-> DataAnalysisETL
 DataAnalysisETL -down->OLAP
 API -down-> ElasticSearch
