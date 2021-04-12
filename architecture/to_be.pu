@@ -7,19 +7,21 @@ database PostgresMovieData
 database PostgresAuthData
 database ElasticSearch
 database OLAP
-database OLTP
+database Kafka
 component AdminPanel
-component Frontend
+component LoadBalancer
+component TokenValidator
 component API
 component Auth
 component ETL
 component DataAnalysisETL
 
-User -right-> Frontend: Запрос на просмотр контента
-Frontend -right-> API: Запрос данных
+User -right-> LoadBalancer: Запрос на просмотр контента
+LoadBalancer -right-> API: Запрос данных
 API -right-> Auth: Запрос на аутентификацию/авторизацию пользователя
-API -down-> OLTP : Запись событий пользователей
-OLTP -down-> DataAnalysisETL
+LoadBalancer -down-> TokenValidator
+TokenValidator -down-> Kafka : Запись событий пользователей
+Kafka -down-> DataAnalysisETL
 DataAnalysisETL -down->OLAP
 API -down-> ElasticSearch
 Auth -right-> PostgresAuthData
