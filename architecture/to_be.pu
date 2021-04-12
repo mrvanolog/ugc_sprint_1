@@ -2,6 +2,7 @@
 
 skinparam componentStyle uml2
 actor User
+actor Analyst
 actor Admin
 database PostgresMovieData
 database PostgresAuthData
@@ -22,7 +23,8 @@ API -right-> Auth: Запрос на аутентификацию/авториз
 LoadBalancer -down-> TokenValidator: Валидация access_token
 TokenValidator -down-> Kafka: Запись событий пользователей
 Kafka -down-> DataAnalysisETL
-DataAnalysisETL -down->OLAP
+DataAnalysisETL -down-> OLAP
+Analyst -up-> OLAP: Анализ данных
 API -down-> ElasticSearch
 Auth -right-> PostgresAuthData
 PostgresMovieData -up-> ETL
