@@ -69,9 +69,9 @@ if __name__ == '__main__':
     execute_query(connection, select_unique_user_id)
 
     select_group_by = """
-    SELECT 
-        user_id, 
-        count(distinct movie_id) 
+    SELECT
+        user_id,
+        count(movie_id)
     FROM views
     GROUP by user_id
     """

@@ -95,3 +95,101 @@ Executing query
 [426110]
 Query execution took: 
 0.020767927169799805
+
+
+*Выполнение запросов при 3 млн записей*
+Executing query
+
+    SELECT COUNT(*) FROM views
+
+[2570440]
+Query execution took: 
+0.04602789878845215
+
+
+Executing query
+
+    SELECT count(DISTINCT movie_id) FROM views
+
+[10000]
+Query execution took: 
+1.0024330615997314
+
+
+Executing query
+
+    SELECT count(DISTINCT user_id) FROM views
+
+[10000]
+Query execution took: 
+1.509639024734497
+
+
+Executing query
+
+    SELECT
+        user_id,
+        count(movie_id)
+    FROM views
+    GROUP by user_id
+    
+Query execution took: 
+2.2240471839904785
+
+
+Executing query
+
+    SELECT 
+        user_id, 
+        sum(viewed_frame),
+        max(viewed_frame) 
+    FROM views
+    GROUP by user_id
+    
+Query execution took: 
+3.720479965209961
+
+
+Executing query
+
+    SELECT 
+        user_id, 
+        sum(viewed_frame),
+        max(viewed_frame) 
+    FROM views
+    WHERE event_time > '2021-04-13 23:09:02'
+    GROUP by user_id
+    
+Query execution took: 
+4.0213212966918945
+
+
+Executing insert query. Rows: 10
+
+    INSERT INTO views (user_id, movie_id, viewed_frame, event_time) VALUES (?,?,?,?)
+
+0.2113478183746338
+
+
+Executing insert query. Rows: 100
+
+    INSERT INTO views (user_id, movie_id, viewed_frame, event_time) VALUES (?,?,?,?)
+
+1.933547019958496
+
+
+Executing insert query. Rows: 1000
+
+    INSERT INTO views (user_id, movie_id, viewed_frame, event_time) VALUES (?,?,?,?)
+
+20.56726098060608
+
+
+Executing query
+
+    SELECT COUNT(*) FROM views
+
+[2579550]
+
+Query execution took:
+0.03425097465515137
