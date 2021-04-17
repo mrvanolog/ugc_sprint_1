@@ -7,8 +7,8 @@ from kafka import KafkaConsumer
 import clickhouse_driver.errors
 import kafka.errors
 
-from settings import backoff
-from settings import (
+from conf.utils import backoff
+from conf.settings import (
     CH_HOST,
     CH_TABLE,
     KAFKA_TOPIC,
@@ -19,7 +19,7 @@ from settings import (
 )
 
 # инициализируем logging
-path_log_conf = Path(__file__).parent.joinpath("log_conf.yaml")
+path_log_conf = Path(__file__).parent.joinpath("conf/log_conf.yaml")
 with path_log_conf.open("r") as f:
     log_conf = yaml.safe_load(f)
 
