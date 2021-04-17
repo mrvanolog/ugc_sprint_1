@@ -39,6 +39,7 @@ def connection_kafka():
                          auto_offset_reset='earliest')
 
 
+# TODO
 def transform(value):
     """Преобразует строку данных из Kafka в формат ClickHouse.
 
@@ -93,9 +94,12 @@ def main():
 
                     values = []
                     flush_start = time.time()
-        except clickhouse_driver.errors.Error or kafka.errors.KafkaError:
+        except clickhouse_driver.errors.Error as e:
+            logging.error(f'Ошибка в соединении с ClickHouse: {e}')
+        except kafka.errors.KafkaError as e:
+            logging.error(f'Ошибка в соединении с Kafka: {e}')
+        finally:
             values_backup = values
-            continue
 
 
 if __name__ == '__main__':
