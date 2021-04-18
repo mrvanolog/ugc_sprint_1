@@ -13,4 +13,4 @@ services:
 networks:
   default:
     external:
-      name: cp-all-in-one_default
+      name: kafka_default
