@@ -1,0 +1,11 @@
+version: "3.8"
+
+
+
+services:
+  kafka-api:
+    build: .
+    image: kafka-api
+    ports:
+      - 8888:8888
+    restart: always
