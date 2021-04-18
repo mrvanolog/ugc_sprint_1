@@ -2,6 +2,7 @@ import time
 import logging.config
 from pathlib import Path
 import yaml
+import json
 from clickhouse_driver import Client
 from kafka import KafkaConsumer
 import clickhouse_driver.errors
@@ -39,17 +40,24 @@ def connection_kafka():
                          auto_offset_reset='earliest')
 
 
-# TODO
-def transform(value):
+def transform(value: dict) -> dict:
     """Преобразует строку данных из Kafka в формат ClickHouse.
 
     Args:
-        value ([type]): строка данных из Kafka
+        value (dict): строка данных из Kafka
 
     Returns:
-        [type]: строка данных для ClickHouse
+        dict: строка данных для ClickHouse
     """
-    return value
+    record = {}
+    try:
+        record['user_id'] = str(value.get('user_id'))
+        record['movie_id'] = str(value.get('movie_id'))
+        record['viewed_frame'] = int(value.get('viewed_frame'))
+    except Exception as e:
+        logger.error(f'При подготовке сообщения возникла ошибка: {e}')
+
+    return record
 
 
 def load(client: Client, values: list) -> bool:
@@ -83,7 +91,8 @@ def main():
             values: list = values_backup
             flush_start = time.time()
             for msg in consumer:
-                record = transform(msg.value)
+                value = json.loads(msg.value)
+                record = transform(value)
                 values.append(record)
 
                 if values >= FLUSH_COUNT or (time.time() - flush_start) >= FLUSH_SECONDS:
