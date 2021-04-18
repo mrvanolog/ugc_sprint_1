@@ -24,37 +24,34 @@ def init_node_1(client: Client):
     client.execute(
         """
         CREATE TABLE shard.viewed_progress (
-            `id` UInt64,
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `event_time` DateTime
+            `created_at` DateTime DEFAULT now()
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard2/viewed_progress', 'replica_1')
-        PARTITION BY toYYYYMMDD(event_time)
+        PARTITION BY toYYYYMMDD(created_at)
         ORDER BY id;
         """
     )
     client.execute(
         """
         CREATE TABLE replica.viewed_progress (
-            `id` UInt64,
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `event_time` DateTime
+            `created_at` DateTime DEFAULT now()
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/viewed_progress', 'replica_2')
-        PARTITION BY toYYYYMMDD(event_time)
+        PARTITION BY toYYYYMMDD(created_at)
         ORDER BY id;
         """
     )
     client.execute(
         """
         CREATE TABLE analysis.viewed_progress (
-            `id` UInt64,
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `event_time` DateTime
+            `created_at` DateTime DEFAULT now()
         ) ENGINE = Distributed('company_cluster', '', viewed_progress, rand());
         """
     )
@@ -67,37 +64,34 @@ def init_node_3(client: Client):
     client.execute(
         """
         CREATE TABLE shard.viewed_progress (
-            `id` UInt64,
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `event_time` DateTime
+            `created_at` DateTime DEFAULT now()
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/viewed_progress', 'replica_1')
-        PARTITION BY toYYYYMMDD(event_time)
+        PARTITION BY toYYYYMMDD(created_at)
         ORDER BY id;
         """
     )
     client.execute(
         """
         CREATE TABLE replica.viewed_progress (
-            `id` UInt64,
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `event_time` DateTime
+            `created_at` DateTime DEFAULT now()
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard2/viewed_progress', 'replica_2')
-        PARTITION BY toYYYYMMDD(event_time)
+        PARTITION BY toYYYYMMDD(created_at)
         ORDER BY id;
         """
     )
     client.execute(
         """
         CREATE TABLE analysis.viewed_progress (
-            `id` UInt64,
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `event_time` DateTime
+            `created_at` DateTime DEFAULT now()
         ) ENGINE = Distributed('company_cluster', '', viewed_progress, rand());
         """
     )
