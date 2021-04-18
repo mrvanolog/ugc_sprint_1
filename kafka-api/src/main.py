@@ -1,4 +1,3 @@
-import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
@@ -32,7 +31,3 @@ async def startup_event():
 async def shutdown_event():
     event_storage: KafkaEventStorage = await get_event_storage()
     await event_storage.producer.stop()
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
