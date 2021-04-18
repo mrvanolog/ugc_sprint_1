@@ -6,6 +6,6 @@ router = APIRouter()
 
 
 @router.post('/view_progress')
-def send_view_progress(viewed_progress: ViewProgress, event_sender:
+async def send_view_progress(viewed_progress: ViewProgress, event_sender:
 EventSender = Depends(get_event_sender)):
-    event_sender.send_viewed_progress(viewed_progress)
+    await event_sender.send_viewed_progress(viewed_progress)

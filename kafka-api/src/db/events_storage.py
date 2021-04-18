@@ -23,12 +23,13 @@ class KafkaEventStorage(AbstractEventStorage):
 
     async def send(self, topic: str, value: str, key: str, *args, **kwargs):
         try:
-            await self.producer.send_and_wait(topic, value)
+            print(f'Sending {topic}, {value}, {key}')
+            await self.producer.send_and_wait(topic=topic, value=value, key=key)
         except Exception as e:
             logger.exception(e)
 
 
-event_storage: Optional[AbstractEventStorage]
+event_storage: Optional[AbstractEventStorage] = None
 
 
 async def get_event_storage() -> AbstractEventStorage:

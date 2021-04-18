@@ -13,10 +13,10 @@ class EventSender:
     def __init__(self, storage: AbstractEventStorage):
         self.storage = storage
 
-    def send_viewed_progress(self, view_progress: ViewProgress):
-        value = json.dumps(view_progress.to_dict())
-        key = f'{view_progress.user_id}+{view_progress.movie_id}'
-        self.storage.send(topic='views', value=value, key=key)
+    async def send_viewed_progress(self, view_progress: ViewProgress):
+        value = json.dumps(view_progress.to_dict()).encode()
+        key = f'{view_progress.user_id}:{view_progress.movie_id}'.encode()
+        await self.storage.send(topic='views', value=value, key=key)
 
 
 def get_event_sender(

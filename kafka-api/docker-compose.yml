@@ -4,8 +4,13 @@ version: "3.8"
 
 services:
   kafka-api:
-    build: src
+    build: .
     image: kafka-api
     ports:
       - 8888:8888
     restart: always
+
+networks:
+  default:
+    external:
+      name: cp-all-in-one_default
