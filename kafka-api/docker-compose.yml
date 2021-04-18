@@ -4,7 +4,7 @@ version: "3.8"
 
 services:
   kafka-api:
-    build: .
+    build: src
     image: kafka-api
     ports:
       - 8888:8888
