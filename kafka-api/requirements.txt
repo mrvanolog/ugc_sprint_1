@@ -1,0 +1,13 @@
+aiokafka==0.7.0
+click==7.1.2
+fastapi==0.63.0
+h11==0.12.0
+kafka-python==2.0.2
+orjson==3.5.2
+py4j==0.10.9
+pydantic==1.8.1
+python-dateutil==2.8.1
+six==1.15.0
+starlette==0.13.6
+typing-extensions==3.7.4.3
+uvicorn==0.13.4
