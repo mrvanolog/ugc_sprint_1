@@ -3,7 +3,7 @@ version: '3.5'
 services:
   zookeeper:
     image: zookeeper:3.5
-    container_name: zookeeper
+    container_name: zookeeper_ch
     hostname: zookeeper
 
   clickhouse-node1:
@@ -56,3 +56,7 @@ services:
       - clickhouse-node2
       - clickhouse-node3
       - clickhouse-node4
+
+networks:
+  default:
+    name: kafka_default
