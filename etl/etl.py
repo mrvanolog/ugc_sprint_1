@@ -30,7 +30,7 @@ def connect_ch():
 
 
 @backoff
-def connection_kafka():
+def connect_kafka():
     return KafkaConsumer(KAFKA_TOPIC, group_id=KAFKA_CONSUMER_GROUP,
                          bootstrap_servers=KAFKA_SERVERS,
                          auto_offset_reset='earliest')
@@ -86,7 +86,7 @@ def main():
             logger.debug('Подключение к CH')
             client_ch = connect_ch()
             logger.debug('Подключение к Kafka')
-            consumer = connection_kafka()
+            consumer = connect_kafka()
             logger.debug('Базы успешно подключены')
 
             # восстанавливаем данные из бэкапа
