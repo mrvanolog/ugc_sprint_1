@@ -1,8 +1,7 @@
 import time
 import logging.config
-from pathlib import Path
-import yaml
 import json
+from datetime import datetime
 from clickhouse_driver import Client
 from kafka import KafkaConsumer
 import clickhouse_driver.errors
@@ -18,11 +17,8 @@ from conf.settings import (
     FLUSH_SECONDS,
     FLUSH_COUNT,
 )
+from conf.settings import log_conf
 
-# инициализируем logging
-path_log_conf = Path(__file__).parent.joinpath("conf/log_conf.yaml")
-with path_log_conf.open("r") as f:
-    log_conf = yaml.safe_load(f)
 
 logging.config.dictConfig(log_conf)
 logger = logging.getLogger("main")
@@ -30,7 +26,7 @@ logger = logging.getLogger("main")
 
 @backoff
 def connect_ch():
-    return Client(host=CH_HOST)
+    return Client.from_url(CH_HOST)
 
 
 @backoff
@@ -54,6 +50,7 @@ def transform(value: dict) -> dict:
         record['user_id'] = str(value.get('user_id'))
         record['movie_id'] = str(value.get('movie_id'))
         record['viewed_frame'] = int(value.get('viewed_frame'))
+        record['created_at'] = datetime.now()
     except Exception as e:
         logger.error(f'При подготовке сообщения возникла ошибка: {e}')
 
@@ -70,32 +67,38 @@ def load(client: Client, values: list) -> bool:
     Returns:
         bool: True если данные были успешно загружены, False в противном случае
     """
+    logger.debug('Загрузка данных в ClickHouse...')
     try:
         client.execute(f'INSERT INTO {CH_TABLE} VALUES', values, types_check=True)
+        logger.debug(f'Успешно загружено {len(values)} строк')
         return True
     except KeyError as e:
-        logging.error(f'Ошибка записи в КХ из-за нехватки поля {e.args[0]} в переданной структуре')
+        logger.error(f'Ошибка записи в КХ из-за нехватки поля {e.args[0]} в переданной структуре')
 
     return False
 
 
 def main():
     values_backup: list = []
+    values: list = []
     while True:
         try:
+            logger.debug('Подключение к CH')
             client_ch = connect_ch()
+            logger.debug('Подключение к Kafka')
             consumer = connection_kafka()
+            logger.debug('Базы успешно подключены')
 
             # восстанавливаем данные из бэкапа
             # или инициализируем пустым списком, если это первый кгруг цикла
-            values: list = values_backup
+            values = values_backup
             flush_start = time.time()
             for msg in consumer:
                 value = json.loads(msg.value)
                 record = transform(value)
                 values.append(record)
 
-                if values >= FLUSH_COUNT or (time.time() - flush_start) >= FLUSH_SECONDS:
+                if len(values) >= FLUSH_COUNT or (time.time() - flush_start) >= FLUSH_SECONDS:
                     res = load(client_ch, values)
                     # если не получилось загрузить данные в Клик, пытаемся в следующий раз
                     if not res:
@@ -104,12 +107,13 @@ def main():
                     values = []
                     flush_start = time.time()
         except clickhouse_driver.errors.Error as e:
-            logging.error(f'Ошибка в соединении с ClickHouse: {e}')
+            logger.error(f'Ошибка в соединении с ClickHouse: {e}')
         except kafka.errors.KafkaError as e:
-            logging.error(f'Ошибка в соединении с Kafka: {e}')
+            logger.error(f'Ошибка в соединении с Kafka: {e}')
         finally:
             values_backup = values
 
 
 if __name__ == '__main__':
+    logger.info('Up\'n\'running')
     main()
