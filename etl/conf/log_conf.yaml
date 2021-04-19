@@ -11,6 +11,10 @@ handlers:
     stream: ext://sys.stdout
 loggers:
   main:
-    level: INFO
+    level: DEBUG
+    handlers: [console]
+    propagate: False
+  backoff:
+    level: DEBUG
     handlers: [console]
     propagate: False
