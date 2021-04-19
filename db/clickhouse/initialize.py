@@ -27,10 +27,10 @@ def init_node_1(client: Client):
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `created_at` DateTime DEFAULT now()
+            `created_at` DateTime
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard2/viewed_progress', 'replica_1')
         PARTITION BY toYYYYMMDD(created_at)
-        ORDER BY id;
+        ORDER BY created_at;
         """
     )
     client.execute(
@@ -39,10 +39,10 @@ def init_node_1(client: Client):
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `created_at` DateTime DEFAULT now()
+            `created_at` DateTime
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/viewed_progress', 'replica_2')
         PARTITION BY toYYYYMMDD(created_at)
-        ORDER BY id;
+        ORDER BY created_at;
         """
     )
     client.execute(
@@ -51,7 +51,7 @@ def init_node_1(client: Client):
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `created_at` DateTime DEFAULT now()
+            `created_at` DateTime
         ) ENGINE = Distributed('company_cluster', '', viewed_progress, rand());
         """
     )
@@ -67,10 +67,10 @@ def init_node_3(client: Client):
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `created_at` DateTime DEFAULT now()
+            `created_at` DateTime
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/viewed_progress', 'replica_1')
         PARTITION BY toYYYYMMDD(created_at)
-        ORDER BY id;
+        ORDER BY created_at;
         """
     )
     client.execute(
@@ -79,10 +79,10 @@ def init_node_3(client: Client):
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `created_at` DateTime DEFAULT now()
+            `created_at` DateTime
         ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard2/viewed_progress', 'replica_2')
         PARTITION BY toYYYYMMDD(created_at)
-        ORDER BY id;
+        ORDER BY created_at;
         """
     )
     client.execute(
@@ -91,7 +91,7 @@ def init_node_3(client: Client):
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
-            `created_at` DateTime DEFAULT now()
+            `created_at` DateTime
         ) ENGINE = Distributed('company_cluster', '', viewed_progress, rand());
         """
     )
