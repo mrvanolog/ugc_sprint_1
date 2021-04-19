@@ -1,0 +1,20 @@
+version: 1
+formatters:
+  default:
+    format: "[%(asctime)s]\t[%(name)s]\t[%(levelname)s]\t%(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: default
+    stream: ext://sys.stdout
+loggers:
+  main:
+    level: DEBUG
+    handlers: [console]
+    propagate: False
+  backoff:
+    level: DEBUG
+    handlers: [console]
+    propagate: False
