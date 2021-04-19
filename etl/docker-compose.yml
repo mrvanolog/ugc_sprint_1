@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  etl:
+    build: .
+    image: etl
+    restart: always
+
+networks:
+    default:
+      name: kafka_default
