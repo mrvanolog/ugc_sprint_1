@@ -1,107 +1,52 @@
+import logging
 import time
-from typing import Tuple
 from clickhouse_driver import Client
 from clickhouse_driver.errors import Error
 
 
+logging.basicConfig(format='[%(asctime)s]\t[%(levelname)s]\t%(message)s', level=logging.INFO)
+
+
 # connect to db
-def connection() -> Tuple[Client]:
+def connection() -> Client:
     while True:
         try:
-            node_1 = Client('clickhouse-node1')
-            node_3 = Client('clickhouse-node3')
-            return node_1, node_3
+            client = Client('clickhouse-node1')
+            return client
         except Error as e:
-            print(e)
-            print("Still trying to connect")
+            logging.error(e)
+            logging.info("still trying to connect...")
             time.sleep(1)
 
 
-def init_node_1(client: Client):
-    client.execute('CREATE DATABASE analysis;')
-    client.execute('CREATE DATABASE shard;')
-    client.execute('CREATE DATABASE replica;')
+# initialize cluster
+def init_cluster(client: Client):
+    client.execute("CREATE DATABASE analysis ON CLUSTER 'company_cluster';")
     client.execute(
         """
-        CREATE TABLE shard.viewed_progress (
+        CREATE TABLE analysis.viewed_progress_repl ON CLUSTER 'company_cluster' (
             `user_id` String,
             `movie_id` String,
             `viewed_frame` UInt64,
             `created_at` DateTime
-        ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard2/viewed_progress', 'replica_1')
+        ) Engine = ReplicatedMergeTree('/clickhouse/tables/{cluster}/{shard}/table', '{replica}')
         PARTITION BY toYYYYMMDD(created_at)
         ORDER BY created_at;
         """
     )
     client.execute(
         """
-        CREATE TABLE replica.viewed_progress (
-            `user_id` String,
-            `movie_id` String,
-            `viewed_frame` UInt64,
-            `created_at` DateTime
-        ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/viewed_progress', 'replica_2')
-        PARTITION BY toYYYYMMDD(created_at)
-        ORDER BY created_at;
-        """
-    )
-    client.execute(
-        """
-        CREATE TABLE analysis.viewed_progress (
-            `user_id` String,
-            `movie_id` String,
-            `viewed_frame` UInt64,
-            `created_at` DateTime
-        ) ENGINE = Distributed('company_cluster', '', viewed_progress, rand());
-        """
-    )
-
-
-def init_node_3(client: Client):
-    client.execute('CREATE DATABASE analysis;')
-    client.execute('CREATE DATABASE shard;')
-    client.execute('CREATE DATABASE replica;')
-    client.execute(
-        """
-        CREATE TABLE shard.viewed_progress (
-            `user_id` String,
-            `movie_id` String,
-            `viewed_frame` UInt64,
-            `created_at` DateTime
-        ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/viewed_progress', 'replica_1')
-        PARTITION BY toYYYYMMDD(created_at)
-        ORDER BY created_at;
-        """
-    )
-    client.execute(
-        """
-        CREATE TABLE replica.viewed_progress (
-            `user_id` String,
-            `movie_id` String,
-            `viewed_frame` UInt64,
-            `created_at` DateTime
-        ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard2/viewed_progress', 'replica_2')
-        PARTITION BY toYYYYMMDD(created_at)
-        ORDER BY created_at;
-        """
-    )
-    client.execute(
-        """
-        CREATE TABLE analysis.viewed_progress (
-            `user_id` String,
-            `movie_id` String,
-            `viewed_frame` UInt64,
-            `created_at` DateTime
-        ) ENGINE = Distributed('company_cluster', '', viewed_progress, rand());
+        CREATE TABLE
+            analysis.viewed_progress
+        ON CLUSTER 'company_cluster' AS analysis.viewed_progress_repl
+        ENGINE = Distributed('company_cluster', analysis, viewed_progress_repl, rand());
         """
     )
 
 
 if __name__ == '__main__':
-    print('connecting')
-    node_1, node_3 = connection()
-    print('init node 1')
-    init_node_1(node_1)
-    print('init node 3')
-    init_node_3(node_3)
-    print('success')
+    logging.info('Connect')
+    client = connection()
+    logging.info('Init cluster')
+    init_cluster(client)
+    logging.info('Success')
