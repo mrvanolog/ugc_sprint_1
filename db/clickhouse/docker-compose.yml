@@ -31,8 +31,6 @@ services:
     image: yandex/clickhouse-server:20.4
     container_name: clickhouse-node3
     hostname: clickhouse-node3
-    ports:
-      - "8124:8123"
     volumes:
       - ./data/node3:/etc/clickhouse-server
     depends_on:
