@@ -6,6 +6,8 @@ services:
   kafka-api:
     build: .
     image: kafka-api
+    env_file:
+      - env/dev.env
     ports:
       - 8888:8888
     restart: always
