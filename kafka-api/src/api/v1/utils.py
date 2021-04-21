@@ -18,5 +18,6 @@ async def auth(authorization: HTTPAuthorizationCredentials = Security(oauth_sche
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
+        return user_id
     except JWTError:
         raise credentials_exception
