@@ -7,13 +7,13 @@ database PostgresMovieData
 database PostgresAuthData
 database ElasticSearch
 component AdminPanel
-component Frontend
+component LoadBalancer
 component API
 component Auth
 component ETL
 
-User -right-> Frontend: Запрос на просмотр контента
-Frontend -right-> API: Запрос данных
+User -right-> LoadBalancer: Запрос на просмотр контента
+LoadBalancer -right-> API: Запрос данных
 API -right-> Auth: Запрос на аутентификацию/авторизацию пользователя
 API -down-> ElasticSearch
 Auth -right-> PostgresAuthData
@@ -21,7 +21,6 @@ PostgresMovieData -up-> ETL
 ETL -down-> PostgresMovieData
 ETL -up-> ElasticSearch
 Admin -left-> AdminPanel: Редактирование данных
-AdminPanel -left-> ElasticSearch
-AdminPanel -up-> PostgresAuthData
+AdminPanel -left-> PostgresMovieData
 
 @enduml

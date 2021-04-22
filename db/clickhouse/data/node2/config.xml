@@ -38,24 +38,20 @@
         <company_cluster>
             <shard>
                 <replica>
-                    <default_database>shard</default_database>
                     <host>clickhouse-node1</host>
                     <port>9000</port>
                 </replica>
                 <replica>
-                    <default_database>replica</default_database>
                     <host>clickhouse-node2</host>
                     <port>9000</port>
                 </replica>
             </shard>
             <shard>
                 <replica>
-                    <default_database>shard</default_database>
                     <host>clickhouse-node3</host>
                     <port>9000</port>
                 </replica>
                 <replica>
-                    <default_database>replica</default_database>
                     <host>clickhouse-node4</host>
                     <port>9000</port>
                 </replica>
